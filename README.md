@@ -15,7 +15,7 @@ Online Clipboard
 * PostgreSQL
 * Sequelize ORM
 * REST API
-* Auth (TBD- Session based vs Token based)
+* Auth (Token based - JWT)
 
 * use Helmet
 * express-session, cors, csurf, bcrypt, jwt

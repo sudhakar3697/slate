@@ -8,7 +8,6 @@ const app = express();
 
 app.use(helmet());
 
-// Logging all the Requests using morgan
 app.use(
   morgan(
     ':date[clf] :user-agent :method :referrer :remote-addr :remote-user :url :status :res[content-length] - :response-time ms',
@@ -18,9 +17,9 @@ app.use(
   ),
 );
 
-const indexRouter = require('./routes/index.js');
+const usersRouter = require('./routes/users.js');
 
-app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
 app.listen(config.PORT, () => {
   logger.info(`App is listening at ${config.PORT}`);
