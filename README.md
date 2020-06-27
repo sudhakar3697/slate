@@ -22,7 +22,7 @@ account lockout
 Limit concurrent requests using a middleware
 NODE_ENV=production
 Enable Gzip Compression (compression)
-Logger, morgan, winston
+Logger (morgan, winston)
 cluster module
 cache with Redis
 Test
