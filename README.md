@@ -17,16 +17,18 @@ Online Clipboard
 * REST API
 * Auth (TBD)
 
-use Helmet, express-session, cors, csurf, bcrypt
-account lockout
-Limit concurrent requests using a middleware
-NODE_ENV=production
-Enable Gzip Compression (compression)
-Logger (morgan, winston)
-cluster module
-cache with Redis,
-Test,Test
-Documentation
+* use Helmet
+* express-session, cors, csurf, bcrypt, jwt
+* Limit concurrent requests using a middleware, account lockout
+* NODE_ENV=production
+* Enable Gzip Compression (compression)
+* Logger (morgan, winston)
+* cluster module,
+* cache with Redis
+* Test
+* Documentation
+* ESLint, eslint-plugin-node, eslint-plugin-node-security
+* dotenv
 
-ESLint, eslint-plugin-node, eslint-plugin-node-security
-dotenv
+### Design 
+<a href="https://docs.google.com/document/d/1xyy0rbtOf97NGG6-cxt6A6X5RAbLr-rocIHkKvGjZ0Y/edit?usp=sharing">Link to Google Doc</a>
