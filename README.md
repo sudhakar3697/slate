@@ -12,23 +12,21 @@ Online Clipboard
 
 ### Tech stack
 * Express.js
-* PostgreSQL
-* Sequelize ORM
+* PostgreSQL with Sequelize ORM
 * REST API
-* Auth (Token based - JWT)
+* Authentication (Token based - JWT)
 
-* use Helmet
-* express-session, cors, csurf, bcrypt, jwt
-* Limit concurrent requests using a middleware, account lockout
-* NODE_ENV=production
-* Enable Gzip Compression (compression)
-* Logger (morgan, winston)
-* cluster module,
-* cache with Redis
-* Test
-* Documentation
-* ESLint, eslint-plugin-node, eslint-plugin-node-security
+* Security (use helmet, cors, csurf, bcrypt, jwt, Limit concurrent requests, account lockout)
+* Performance (NODE_ENV=production, Enable Gzip Compression (compression), Load balancing (cluster module))
+* Logging (morgan, winston)
+* Caching (Redis)
+* Linting (ESLint - airbnb, eslint-plugin-node, eslint-plugin-node-security)
+* Code formatting (VS Code default)
 * dotenv
+* nodemon
+* Testing
+* Documentation
+* Hosting, Deployment (Heroku)
 
 ### Design 
 <a href="https://docs.google.com/document/d/1xyy0rbtOf97NGG6-cxt6A6X5RAbLr-rocIHkKvGjZ0Y/edit?usp=sharing">Link to Google Doc</a>
