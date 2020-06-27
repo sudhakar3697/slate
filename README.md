@@ -14,3 +14,17 @@ Online Clipboard
 * Sequelize ORM
 * REST API
 * Auth (TBD)
+
+use Helmet, express-session, cors, csurf, bcrypt
+account lockout
+Limit concurrent requests using a middleware
+NODE_ENV=production
+Enable Gzip Compression (compression)
+Logger, morgan, winston
+cluster module
+cache with Redis
+Test
+Documentation
+
+ESLint, eslint-plugin-node, eslint-plugin-node-security
+dotenv
