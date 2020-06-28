@@ -1,7 +1,51 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const logger = require('../custom-logger.js');
+const config = require('../config.js');
 const userInfo = require('../models/user-info.js');
 
-const saltRounds = 10;
+function encodeRegistrationToken(id) {
+  const token = jwt.sign({ id }, config.SECRET_KEY);
+  return token;
+}
+
+function decodeRegistrationToken(token) {
+  const decoded = jwt.verify(token, config.SECRET_KEY);
+  const userId = decoded.id;
+  const dateNow = new Date();
+  const tokenTime = decoded.iat * 1000;
+  const hours = 1;
+  const tokenLife = hours * 60 * 1000;
+
+  if (tokenTime + tokenLife < dateNow.getTime()) {
+    return { expired: true };
+  }
+
+  return {
+    userId,
+  };
+}
+
+async function sendConfirmationMail(token, mailId) {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: config.CONFIRMATION_MAIL,
+      pass: config.CONFIRMATION_MAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Slate - Online Clipboard" <${config.CONFIRMATION_MAIL}>`,
+    to: mailId,
+    subject: 'Confirm your account on Slate',
+    html: `<a href='http://localhost:${config.PORT}/users/verification?token=${token}'>Click here to confirm</a>`,
+  };
+
+  const response = await transporter.sendMail(mailOptions);
+  logger.info(response.messageId);
+}
 
 module.exports = {
   getUsers: async (req, res) => {
@@ -16,7 +60,7 @@ module.exports = {
       const {
         password, id, name, email,
       } = req.body;
-      const encryptedPassword = await bcrypt.hash(password, saltRounds);
+      const encryptedPassword = await bcrypt.hash(password, config.SALT_ROUNDS);
       await userInfo.create({
         id,
         name,
@@ -24,7 +68,19 @@ module.exports = {
         email,
         verified: false,
       });
+      const token = encodeRegistrationToken(id);
+      sendConfirmationMail(token, email);
       res.send('User added');
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+  verifyUser: async (req, res) => {
+    try {
+      const { userId } = decodeRegistrationToken(req.query.token);
+      const record = await userInfo.findByPk(userId);
+      record.update({ verified: true });
+      res.send('successfully verified your account');
     } catch (err) {
       res.status(400).send(err.message);
     }
