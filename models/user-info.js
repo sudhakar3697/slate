@@ -1,7 +1,8 @@
 const { Sequelize } = require('sequelize');
 const logger = require('../custom-logger.js');
+const config = require('../config.js');
 
-const sequelize = new Sequelize('sudax', 'postgres', '1234', {
+const sequelize = new Sequelize(config.DATABASE, config.USER_NAME, config.PASSWORD, {
   host: 'localhost',
   dialect: 'postgres',
 });
