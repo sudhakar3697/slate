@@ -114,4 +114,14 @@ module.exports = {
       res.status(400).send(err.message);
     }
   },
+  resendConfirmationEmail: async (req, res) => {
+    try {
+      const record = await userInfo.findByPk('test1');
+      const token = encodeRegistrationToken(record.id);
+      sendConfirmationMail(token, record.email);
+      res.send('Confirmation mail has been sent');
+    } catch (err) {
+      res.status(400).send('Confirmation mail not sent');
+    }
+  },
 };
