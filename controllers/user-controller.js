@@ -87,7 +87,7 @@ module.exports = {
         <script>
             async function sendConfirmation() {
                 let response = await fetch('http://localhost:5000/users/verification', {
-                    method: 'PUT',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                     },
