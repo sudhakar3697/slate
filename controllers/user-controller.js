@@ -75,12 +75,42 @@ module.exports = {
       res.status(400).send(err.message);
     }
   },
+  showVerifyUserUI: async (req, res) => {
+    res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Slate - Email verification</title>
+    </head>
+    <body>
+        <button onclick="sendConfirmation()">Click here to verify your email</button>
+        <script>
+            async function sendConfirmation() {
+                let response = await fetch('http://localhost:5000/users/verification', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token: '${req.query.token}' })
+            });
+            response = await response.text();
+            alert(response);
+    }
+        </script>
+    </body>
+    </html>
+    `);
+  },
   verifyUser: async (req, res) => {
     try {
-      const { userId } = decodeRegistrationToken(req.query.token);
-      const record = await userInfo.findByPk(userId);
-      record.update({ verified: true });
-      res.send('successfully verified your account');
+      const { userId, expired } = decodeRegistrationToken(req.body.token);
+      if (expired) {
+        res.send('Verification email expired. Resend confirmation email to verify.');
+      } else {
+        const record = await userInfo.findByPk(userId);
+        record.update({ verified: true });
+        res.send('Successfully verified your account. You may close this window.');
+      }
     } catch (err) {
       res.status(400).send(err.message);
     }
