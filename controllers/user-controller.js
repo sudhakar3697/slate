@@ -15,8 +15,7 @@ function decodeRegistrationToken(token) {
   const userId = decoded.id;
   const dateNow = new Date();
   const tokenTime = decoded.iat * 1000;
-  const hours = 1;
-  const tokenLife = hours * 60 * 1000;
+  const tokenLife = 3600000;
 
   if (tokenTime + tokenLife < dateNow.getTime()) {
     return { expired: true };
