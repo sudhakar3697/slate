@@ -12,10 +12,10 @@ router.get('/password-reset', (req, res) => userController.showResetPasswordUI(r
 router.post('/password-reset', (req, res) => userController.sendResetPasswordEmail(req, res));
 router.patch('/password-reset', (req, res) => userController.resetPassword(req, res));
 router.post('/login', (req, res) => userController.signIn(req, res));
-// logout - DELETE
+router.delete('/logout', ensureAuthentication, (req, res) => userController.signOut(req, res));
+router.delete('/', ensureAuthentication, (req, res) => userController.deleteAccount(req, res));
+router.patch('/password-change', ensureAuthentication, (req, res) => userController.changePassword(req, res));
 router.get('/:id', ensureAuthentication, (req, res) => userController.getUserInfo(req, res));
-// edit profile - PUT/PATCH (email, Display name)
-// change password - PUT/PATCH
-// delete account - DELETE
+router.patch('/', ensureAuthentication, (req, res) => userController.editProfile(req, res));
 
 module.exports = router;
