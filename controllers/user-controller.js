@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const logger = require('../custom-logger.js');
 const config = require('../config.js');
 const userInfo = require('../models/user-info.js');
+const userSessionInfo = require('../models/user-session-info.js');
 
 function encodeRegistrationToken(id) {
   const token = jwt.sign({ id }, config.SECRET_KEY);
@@ -47,13 +48,6 @@ async function sendConfirmationMail(token, mailId) {
 }
 
 module.exports = {
-  getUsers: async (req, res) => {
-    try {
-      res.json(await userInfo.findAll({}));
-    } catch (err) {
-      res.json(err);
-    }
-  },
   addUser: async (req, res) => {
     try {
       const {
@@ -183,6 +177,41 @@ module.exports = {
       const encryptedPassword = await bcrypt.hash(password, config.SALT_ROUNDS);
       await record.update({ password: encryptedPassword });
       res.send('Password changed successfully');
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+  getUserInfo: async (req, res) => {
+    try {
+      const record = await userInfo.findByPk(req.params.id);
+      if (record) {
+        res.send(record);
+      } else {
+        res.status(404).send();
+      }
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+  signIn: async (req, res) => {
+    try {
+      const { id, password } = req.body;
+      const record = await userInfo.findByPk(id);
+      if (await bcrypt.compare(password, record.password)) {
+        const sessionId = (await userSessionInfo.count({
+          where: {
+            id,
+          },
+        })) + 1;
+        const token = jwt.sign({ id, sessionId }, config.SECRET_KEY + record.password);
+        await userSessionInfo.create({
+          id,
+          sessionId,
+        });
+        res.send(token);
+      } else {
+        res.status(403).send('Incorrect Username/Password');
+      }
     } catch (err) {
       res.status(400).send(err.message);
     }
