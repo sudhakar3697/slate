@@ -13,7 +13,6 @@ function encodeRegistrationToken(id) {
 
 function decodeRegistrationToken(token) {
   const decoded = jwt.verify(token, config.SECRET_KEY);
-  const userId = decoded.id;
   const dateNow = new Date();
   const tokenTime = decoded.iat * 1000;
   const tokenLife = 3600000;
@@ -23,7 +22,7 @@ function decodeRegistrationToken(token) {
   }
 
   return {
-    userId,
+    id: decoded.id,
   };
 }
 
@@ -110,7 +109,7 @@ module.exports = {
   },
   resendConfirmationEmail: async (req, res) => {
     try {
-      const record = await userInfo.findByPk('test1');
+      const record = await userInfo.findByPk(req.user.id);
       const token = encodeRegistrationToken(record.id);
       sendConfirmationMail(token, record.email);
       res.send('Confirmation mail has been sent');
@@ -173,7 +172,7 @@ module.exports = {
   resetPassword: async (req, res) => {
     try {
       const { token, password } = req.body;
-      const decodedUserId = await decodeRegistrationToken(token).userId;
+      const decodedUserId = await decodeRegistrationToken(token).id;
       const record = await userInfo.findByPk(decodedUserId);
       const encryptedPassword = await bcrypt.hash(password, config.SALT_ROUNDS);
       await record.update({ password: encryptedPassword });
@@ -187,7 +186,7 @@ module.exports = {
   },
   getUserInfo: async (req, res) => {
     try {
-      const record = await userInfo.findByPk(req.params.id);
+      const record = await userInfo.findByPk(req.user.id);
       if (record) {
         res.send(record);
       } else {
