@@ -12,7 +12,7 @@ router.post('/verification', (req, res) => userController.resendConfirmationEmai
 router.get('/password-reset', (req, res) => userController.showResetPasswordUI(req, res));
 router.post('/password-reset', (req, res) => userController.sendResetPasswordEmail(req, res));
 router.patch('/password-reset', (req, res) => userController.resetPassword(req, res));
-router.post('/sign-in', (req, res) => userController.signIn(req, res));
+router.post('/login', (req, res) => userController.signIn(req, res));
 router.get('/:id', ensureAuthentication, (req, res) => userController.getUserInfo(req, res));
 
 module.exports = router;
