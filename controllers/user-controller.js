@@ -48,13 +48,6 @@ async function sendConfirmationMail(token, mailId) {
 }
 
 module.exports = {
-  getUsers: async (req, res) => {
-    try {
-      res.json(await userInfo.findAll({}));
-    } catch (err) {
-      res.json(err);
-    }
-  },
   addUser: async (req, res) => {
     try {
       const {

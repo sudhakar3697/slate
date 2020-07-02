@@ -4,7 +4,6 @@ const ensureAuthentication = require('../middlewares/auth.js');
 
 const router = express.Router();
 
-router.get('/', (req, res) => userController.getUsers(req, res));
 router.post('/', (req, res) => userController.addUser(req, res));
 router.get('/verification', (req, res) => userController.showVerifyUserUI(req, res));
 router.patch('/verification', (req, res) => userController.verifyUser(req, res));
@@ -13,6 +12,10 @@ router.get('/password-reset', (req, res) => userController.showResetPasswordUI(r
 router.post('/password-reset', (req, res) => userController.sendResetPasswordEmail(req, res));
 router.patch('/password-reset', (req, res) => userController.resetPassword(req, res));
 router.post('/login', (req, res) => userController.signIn(req, res));
+// logout - DELETE
 router.get('/:id', ensureAuthentication, (req, res) => userController.getUserInfo(req, res));
+// edit profile - PUT/PATCH (email, Display name)
+// change password - PUT/PATCH
+// delete account - DELETE
 
 module.exports = router;
