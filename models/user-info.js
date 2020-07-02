@@ -2,10 +2,26 @@ const Sequelize = require('sequelize');
 const logger = require('../custom-logger.js');
 const config = require('../config.js');
 
-const sequelize = new Sequelize(config.DATABASE, config.USER_NAME, config.PASSWORD, {
-  host: 'localhost',
-  dialect: 'postgres',
-});
+let sequelize;
+
+if (config.HEROKU_PG_DATABASE_URL) {
+  sequelize = new Sequelize(config.HEROKU_PG_DATABASE_URL, {
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+      // ssl: true,
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  });
+} else {
+  sequelize = new Sequelize(config.DATABASE, config.USER_NAME, config.PASSWORD, {
+    host: 'localhost',
+    dialect: 'postgres',
+  });
+}
 
 try {
   (async () => {
