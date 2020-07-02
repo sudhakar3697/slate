@@ -96,11 +96,11 @@ module.exports = {
   },
   verifyUser: async (req, res) => {
     try {
-      const { userId, expired } = decodeRegistrationToken(req.body.token);
+      const { id, expired } = decodeRegistrationToken(req.body.token);
       if (expired) {
         res.send('Verification email expired. Resend confirmation email to verify.');
       } else {
-        const record = await userInfo.findByPk(userId);
+        const record = await userInfo.findByPk(id);
         await record.update({ verified: true });
         res.send('Successfully verified your account. You may close this window.');
       }
@@ -173,9 +173,13 @@ module.exports = {
   resetPassword: async (req, res) => {
     try {
       const { token, password } = req.body;
-      const record = await userInfo.findByPk(decodeRegistrationToken(token).userId);
+      const decodedUserId = await decodeRegistrationToken(token).userId;
+      const record = await userInfo.findByPk(decodedUserId);
       const encryptedPassword = await bcrypt.hash(password, config.SALT_ROUNDS);
       await record.update({ password: encryptedPassword });
+      await userSessionInfo.destroy({
+        where: { id: decodedUserId },
+      });
       res.send('Password changed successfully');
     } catch (err) {
       res.status(400).send(err.message);
@@ -198,12 +202,8 @@ module.exports = {
       const { id, password } = req.body;
       const record = await userInfo.findByPk(id);
       if (await bcrypt.compare(password, record.password)) {
-        const sessionId = (await userSessionInfo.count({
-          where: {
-            id,
-          },
-        })) + 1;
-        const token = jwt.sign({ id, sessionId }, config.SECRET_KEY + record.password);
+        const sessionId = Date.now().toString();
+        const token = jwt.sign({ id, sessionId }, config.SECRET_KEY);
         await userSessionInfo.create({
           id,
           sessionId,
@@ -212,6 +212,68 @@ module.exports = {
       } else {
         res.status(403).send('Incorrect Username/Password');
       }
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+  signOut: async (req, res) => {
+    try {
+      await userSessionInfo.destroy({
+        where: {
+          id: req.user.id,
+          sessionId: req.user.sessionId,
+        },
+      });
+      res.send('You have been logged out');
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+  deleteAccount: async (req, res) => {
+    try {
+      await userSessionInfo.destroy({
+        where: {
+          id: req.user.id,
+        },
+      });
+      await userInfo.destroy({
+        where: {
+          id: req.user.id,
+        },
+      });
+      res.send('You account has been deleted');
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+  changePassword: async (req, res) => {
+    try {
+      const record = await userInfo.findByPk(req.user.id);
+      const encryptedPassword = await bcrypt.hash(req.body.password, config.SALT_ROUNDS);
+      await record.update({
+        password: encryptedPassword,
+      });
+      await userSessionInfo.destroy({
+        where: { id: req.user.id },
+      });
+      res.send('Password changed successfully');
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  },
+  editProfile: async (req, res) => {
+    try {
+      const record = await userInfo.findByPk(req.user.id);
+      await record.update({
+        name: req.body.name,
+        email: req.body.email,
+        verified: (req.body.email === record.email && record.verified),
+      });
+      if (!record.verified) {
+        const token = encodeRegistrationToken(req.user.id);
+        sendConfirmationMail(token, record.email);
+      }
+      res.send('Profile updated successfully');
     } catch (err) {
       res.status(400).send(err.message);
     }
