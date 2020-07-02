@@ -39,7 +39,7 @@ async function sendConfirmationMail(token, mailId) {
     from: `"Slate - Online Clipboard" <${config.CONFIRMATION_MAIL}>`,
     to: mailId,
     subject: 'Confirm your account on Slate',
-    html: `<a href='http://localhost:${config.PORT}/users/verification?token=${token}'>Click here to confirm</a>`,
+    html: `<a href='${config.BASE_URL}/users/verification?token=${token}'>Click here to confirm</a>`,
   };
 
   const response = await transporter.sendMail(mailOptions);
@@ -78,7 +78,7 @@ module.exports = {
         <button onclick="sendConfirmation()">Click here to verify your email</button>
         <script>
             async function sendConfirmation() {
-                let response = await fetch('http://localhost:5000/users/verification', {
+                let response = await fetch('${config.BASE_URL}/users/verification', {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ module.exports = {
         from: `"Slate - Online Clipboard" <${config.CONFIRMATION_MAIL}>`,
         to: req.body.email,
         subject: 'Reset your Slate Account Password',
-        html: `<a href='http://localhost:${config.PORT}/users/password-reset?token=${token}'>Click here to reset your password</a>`,
+        html: `<a href='${config.BASE_URL}/users/password-reset?token=${token}'>Click here to reset your password</a>`,
       };
       const response = await transporter.sendMail(mailOptions);
       logger.info(response.messageId);
@@ -155,7 +155,7 @@ module.exports = {
           <button onclick="changePassword()">Reset password</button>
           <script>
               async function changePassword() {
-                  let response = await fetch('http://localhost:${config.PORT}/users/password-reset', {
+                  let response = await fetch('${config.BASE_URL}/users/password-reset', {
                       method: 'PATCH',
                       headers: {
                           'Content-Type': 'application/json',
