@@ -27,7 +27,7 @@ module.exports = async (req, res, next) => {
       const decoded = jwt.verify(token, config.SECRET_KEY + hashedPassword);
       const record = await userSessionInfo.findOne({
         where: {
-          id,
+          id: decoded.id,
           sessionId: decoded.sessionId.toString(),
         },
       });
