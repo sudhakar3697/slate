@@ -50,6 +50,9 @@ Users.init(
     password: {
       type: Sequelize.STRING,
     },
+    salt: {
+      type: Sequelize.STRING,
+    },
     verified: {
       type: Sequelize.BOOLEAN,
     },

@@ -52,12 +52,14 @@ module.exports = {
       const {
         password, id, name, email,
       } = req.body;
-      const encryptedPassword = await bcrypt.hash(password, config.SALT_ROUNDS);
+      const salt = await bcrypt.genSalt();
+      const encryptedPassword = await bcrypt.hash(password, salt);
       await userInfo.create({
         id,
         name,
         password: encryptedPassword,
         email,
+        salt,
         verified: false,
       });
       const token = encodeRegistrationToken(id);
@@ -174,8 +176,9 @@ module.exports = {
       const { token, password } = req.body;
       const decodedUserId = await decodeRegistrationToken(token).id;
       const record = await userInfo.findByPk(decodedUserId);
-      const encryptedPassword = await bcrypt.hash(password, config.SALT_ROUNDS);
-      await record.update({ password: encryptedPassword });
+      const salt = await bcrypt.genSalt();
+      const encryptedPassword = await bcrypt.hash(password, salt);
+      await record.update({ password: encryptedPassword, salt });
       await userSessionInfo.destroy({
         where: { id: decodedUserId },
       });
@@ -248,9 +251,11 @@ module.exports = {
   changePassword: async (req, res) => {
     try {
       const record = await userInfo.findByPk(req.user.id);
-      const encryptedPassword = await bcrypt.hash(req.body.password, config.SALT_ROUNDS);
+      const salt = await bcrypt.genSalt();
+      const encryptedPassword = await bcrypt.hash(req.body.password, salt);
       await record.update({
         password: encryptedPassword,
+        salt,
       });
       await userSessionInfo.destroy({
         where: { id: req.user.id },
